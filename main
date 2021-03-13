@@ -2,6 +2,6 @@
 chmod +x /home/user/InvestMachine2021.03/okex-process.py
 chmod +x /home/user/InvestMachine2021.03/okex-connector.py
 
-./okex-process.py &
-sleep 0.01
 ./okex-connector.py &
+sleep 0.1
+./okex-process.py &
