@@ -2,7 +2,6 @@
 
 import socket
 import os
-import sys
 import websocket
 import json
 import zlib
@@ -32,10 +31,6 @@ def send_to_udsocket(sock, message):
     with conn:
         # print('Connected by', addr)
         conn.sendall(message)
-
-    # finally:
-    #     print('closing Unix Domain socket')
-    #     sock.close()
 
 
 def on_open(ws):
@@ -75,7 +70,6 @@ if __name__ == "__main__":
     # # Create a UDS socket
     server_address='./uds_socket'
     sock = start_uds_server(server_address)
-    count = 0
 
     ws_url = "wss://real.okex.com:8443/ws/v3"
     ws = websocket.WebSocketApp(ws_url, on_open=on_open, on_message=on_message, on_close=on_close)
