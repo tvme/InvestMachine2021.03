@@ -1,10 +1,9 @@
-#!/home/user/InvestMachine2021.03/env/bin/python3
+#!./env/bin/python3
 
 import socket
 import os
-import websocket
+from websocket import WebSocketApp
 import json
-import zlib
 
 def start_uds_server(server_address):
     # Make sure the socket does not already exist
@@ -24,7 +23,6 @@ def start_uds_server(server_address):
     return sock
 
 
-
 def send_to_udsocket(sock, message):
     conn, addr = sock.accept()
     # Send data
@@ -39,7 +37,7 @@ def on_open(ws):
     print(f"opened {ws.url}")
     channel_data =  {
                     "op": "subscribe", 
-                    "args": ["spot/trade:ETH-USDT"]
+                    "args": ws.args
                     }
 
     ws.send(json.dumps(channel_data))
@@ -47,10 +45,8 @@ def on_open(ws):
 
 def on_message(ws, message):
     if os.path.isfile('./run.flag'):
-        decompress = zlib.decompressobj(-zlib.MAX_WBITS)
-        dec_messge = decompress.decompress(message)
-        if dec_messge:  # sending not empty message
-            send_to_udsocket(sock, dec_messge)
+        if message:  # sending not empty message
+            send_to_udsocket(sock, message)
     else:
         ws.close()
         raise SystemExit
@@ -59,11 +55,10 @@ def on_message(ws, message):
 def on_close(ws):
     channel_data = {
                     "op": "unsubscribe", 
-                    "args": ["spot/trade:ETH-USDT"]
+                    "args": ws.args
                    }
     ws.send(json.dumps(channel_data))
     print("closed connection")
-
 
 
 if __name__ == "__main__":
@@ -72,6 +67,7 @@ if __name__ == "__main__":
     sock = start_uds_server(server_address)
 
     ws_url = "wss://real.okex.com:8443/ws/v3"
-    ws = websocket.WebSocketApp(ws_url, on_open=on_open, on_message=on_message, on_close=on_close)
+    ws = WebSocketApp(ws_url, on_open=on_open, on_message=on_message, on_close=on_close)
+    ws.args = ["spot/trade:ETH-USDT", "swap/trade:ETH-USDT-SWAP"]
     ws.run_forever()
 

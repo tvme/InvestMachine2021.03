@@ -1,11 +1,14 @@
-#!/home/user/InvestMachine2021.03/env/bin/python3
+#!./env/bin/python3
 
 import socket
+import zlib
 import sys
 
 
 def process_message(message):
-    message_out(message)
+    decompress = zlib.decompressobj(-zlib.MAX_WBITS)
+    dec_messge = decompress.decompress(message)
+    message_out(dec_messge)
 
 
 def message_out(message):
